@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Schedule to ICS Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 300px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .example {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .example h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .example pre {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            border: 1px solid #e0e0e0;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3c3;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Work Schedule to ICS</h1>
+            <p>Convert your work schedule to a calendar file</p>
+        </div>
+
+        <form id="scheduleForm">
+            <div class="form-group">
+                <label for="personName">Person Name (Vaktansvarlig):</label>
+                <input type="text" id="personName" name="personName" placeholder="e.g., Stine" required>
+            </div>
+
+            <div class="form-group">
+                <label for="scheduleData">Paste your duty list here:</label>
+                <textarea id="scheduleData" name="scheduleData" placeholder="Paste your schedule data here..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn">Generate ICS Calendar File</button>
+        </form>
+
+        <div class="example">
+            <h3>📋 Example Format:</h3>
+            <pre>No	Date	Work Time	Location
+1	05.08.2025	06:30-14:00	0092 Extra Grilstad
+2	06.08.2025	13:00-20:00	0092 Extra Grilstad
+3	07.08.2025	08:00-15:00	0092 Extra Grilstad</pre>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const personName = document.getElementById('personName').value.trim();
+            const scheduleData = document.getElementById('scheduleData').value.trim();
+            const messageDiv = document.getElementById('message');
+            
+            if (!personName || !scheduleData) {
+                showMessage('Please fill in both fields.', 'error');
+                return;
+            }
+            
+            try {
+                const icsContent = generateICS(personName, scheduleData);
+                downloadICS(icsContent, `${personName}_work_schedule.ics`);
+                showMessage('✅ ICS file generated successfully!', 'success');
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        });
+
+        function generateICS(personName, scheduleData) {
+            const lines = scheduleData.split('\n').filter(line => line.trim());
+            const events = [];
+            
+            // Skip header line and process data lines
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // Parse the line - split by tabs or multiple spaces
+                const parts = line.split(/\t+|\s{2,}/).filter(part => part.trim());
+                
+                if (parts.length < 4) {
+                    // Try splitting by single tab or comma
+                    const altParts = line.split(/\t|,/).map(p => p.trim()).filter(p => p);
+                    if (altParts.length >= 4) {
+                        parts.splice(0, parts.length, ...altParts);
+                    } else {
+                        continue; // Skip malformed lines
+                    }
+                }
+                
+                const [no, dateStr, timeStr, location] = parts;
+                
+                if (!dateStr || !timeStr) continue;
+                
+                // Parse date (DD.MM.YYYY format)
+                const dateParts = dateStr.split('.');
+                if (dateParts.length !== 3) continue;
+                
+                const day = parseInt(dateParts[0]);
+                const month = parseInt(dateParts[1]);
+                const year = parseInt(dateParts[2]);
+                
+                if (isNaN(day) || isNaN(month) || isNaN(year)) continue;
+                
+                // Parse time (HH:MM-HH:MM format)
+                const timeParts = timeStr.split('-');
+                if (timeParts.length !== 2) continue;
+                
+                const [startTime, endTime] = timeParts;
+                const [startHour, startMin] = startTime.split(':').map(n => parseInt(n));
+                const [endHour, endMin] = endTime.split(':').map(n => parseInt(n));
+                
+                if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) continue;
+                
+                // Create start and end datetime objects
+                const startDate = new Date(year, month - 1, day, startHour, startMin);
+                let endDate = new Date(year, month - 1, day, endHour, endMin);
+                
+                // If end time is before start time, it's next day
+                if (endDate <= startDate) {
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+                
+                events.push({
+                    title: `${personName} vakt ${timeStr}`,
+                    location: location || '',
+                    startDate: startDate,
+                    endDate: endDate
+                });
+            }
+            
+            if (events.length === 0) {
+                throw new Error('No valid schedule entries found. Please check your data format.');
+            }
+            
+            // Generate ICS content
+            let icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Work Schedule Converter//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH'
+            ].join('\r\n');
+            
+            events.forEach((event, index) => {
+                const uid = `work-${Date.now()}-${index}@workscheduler.local`;
+                const dtStamp = formatICSDate(new Date());
+                const dtStart = formatICSDate(event.startDate);
+                const dtEnd = formatICSDate(event.endDate);
+                
+                icsContent += '\r\n' + [
+                    'BEGIN:VEVENT',
+                    `UID:${uid}`,
+                    `DTSTAMP:${dtStamp}`,
+                    `DTSTART:${dtStart}`,
+                    `DTEND:${dtEnd}`,
+                    `SUMMARY:${event.title}`,
+                    `LOCATION:${event.location}`,
+                    'STATUS:CONFIRMED',
+                    'TRANSP:OPAQUE',
+                    'END:VEVENT'
+                ].join('\r\n');
+            });
+            
+            icsContent += '\r\nEND:VCALENDAR';
+            
+            return icsContent;
+        }
+        
+        function formatICSDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            const second = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${year}${month}${day}T${hour}${minute}${second}`;
+        }
+        
+        function downloadICS(content, filename) {
+            const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
