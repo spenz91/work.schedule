@@ -25,9 +25,12 @@ Convert your work schedule into a calendar file (`.ics`) you can import into Goo
 ---
 
 ## 📋 Example Input
+
+```bash
 No	Date	Work Time	Location
 1	05.08.2025	06:30-14:00	0092 Extra Grilstad
 2	06.08.2025	13:00-20:00	0092 Extra Grilstad
 3	07.08.2025	08:00-15:00	0092 Extra Grilstad
+```
 
 
