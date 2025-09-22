@@ -1,0 +1,47 @@
+# 📅 Work Schedule to ICS Converter
+
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fworkschedule.site&label=Live%20Demo&logo=google-chrome&logoColor=white)](https://workschedule.site) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Convert your work schedule into a calendar file (`.ics`) you can import into Google Calendar, Outlook or Apple Calendar.  
+
+---
+
+## 🚀 Quick Start
+
+Run this command to clone and open locally:
+
+```bash
+git clone https://github.com/yourusername/work-schedule-ics.git && cd work-schedule-ics && start index.html
+
+
+# 📅 Work Schedule to ICS Converter
+
+Convert your work schedule into a calendar file (`.ics`) you can import into Google Calendar, Outlook or Apple Calendar.
+
+---
+
+## ✨ Features
+- Paste your duty list in table format  
+- Specify the person in charge (“Vaktansvarlig”)  
+- Generate `.ics` calendar file in browser  
+- Supports overnight shifts (end time past midnight)  
+
+---
+
+## 🚀 How to Use
+
+1. Visit the site: https://workschedule.site/  
+2. Enter “Person Name (Vaktansvarlig)”  
+3. Paste your schedule data  
+4. Click **Generate ICS Calendar File**  
+5. Download and import into your calendar app  
+
+---
+
+## 📋 Example Input
+No	Date	Work Time	Location
+1	05.08.2025	06:30-14:00	0092 Extra Grilstad
+2	06.08.2025	13:00-20:00	0092 Extra Grilstad
+3	07.08.2025	08:00-15:00	0092 Extra Grilstad
+
+
