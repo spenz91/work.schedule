@@ -6,20 +6,6 @@ Convert your work schedule into a calendar file (`.ics`) you can import into Goo
 
 ---
 
-## 🚀 Quick Start
-
-Run this command to clone and open locally:
-
-```bash
-git clone https://github.com/yourusername/work-schedule-ics.git && cd work-schedule-ics && start index.html
-
-
-# 📅 Work Schedule to ICS Converter
-
-Convert your work schedule into a calendar file (`.ics`) you can import into Google Calendar, Outlook or Apple Calendar.
-
----
-
 ## ✨ Features
 - Paste your duty list in table format  
 - Specify the person in charge (“Vaktansvarlig”)  
